@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - KG</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>KG</h1>
+                </div>
+                <nav class="nav" id="mainNav">
+                    <a href="index.html">Home</a>
+                    <a href="about.html">About</a>
+                    <a href="services.html">Services</a>
+                    <a href="products.html">Products</a>
+                    <a href="contact.html" class="active">Contact</a>
+                    <a href="cart.html" class="cart-link">
+                        Cart <span class="cart-badge" id="cartCount">0</span>
+                    </a>
+                </nav>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content" style="text-align: center; max-width: 100%;">
+                <h1>Contact Us</h1>
+                <p>Get in touch with our team for inquiries, quotes, or support</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="page-content">
+        <div class="container">
+            <div class="contact-container">
+                <!-- Contact Form -->
+                <div class="contact-form-wrapper">
+                    <h2>Send Us a Message</h2>
+                    <form id="contactForm" class="contact-form">
+                        <div class="form-group">
+                            <label for="name">Full Name *</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subject">Subject *</label>
+                            <select id="subject" name="subject" required>
+                                <option value="">Select a subject</option>
+                                <option value="general">General Inquiry</option>
+                                <option value="quote">Request a Quote</option>
+                                <option value="bulk">Bulk Order</option>
+                                <option value="support">Customer Support</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Message *</label>
+                            <textarea id="message" name="message" rows="6" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" style="background-color: #f97316; color: #fff; width: 100%;">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="contact-info-wrapper">
+                    <h2>Contact Information</h2>
+                    
+                    <div class="contact-info-item">
+                        <h3>Email</h3>
+                        <p><a href="mailto:info@kg.co.za">info@kg.co.za</a></p>
+                    </div>
+                    
+                    <div class="contact-info-item">
+                        <h3>Service Areas</h3>
+                        <p>Limpopo Province</p>
+                        <p>Gauteng Province</p>
+                    </div>
+                    
+                    <div class="contact-info-item">
+                        <h3>Business Hours</h3>
+                        <p>Monday - Friday: 8:00 AM - 5:00 PM</p>
+                        <p>Saturday: 8:00 AM - 1:00 PM</p>
+                        <p>Sunday: Closed</p>
+                    </div>
+                    
+                    <div class="contact-info-item">
+                        <h3>Online Ordering</h3>
+                        <p>24/7 access to our product catalog</p>
+                        <p>Orders processed during business hours</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="khavho-banner">
+        <div class="container">
+            <h2>Prefer to Shop Online?</h2>
+            <p>Browse our catalog of 58+ products available for immediate order</p>
+            <a href="products.html" class="btn btn-white">View All Products</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>KG</h3>
+                    <p>Your trusted procurement partner</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Our Group</h4>
+                    <ul>
+                        <li><a href="https://khavhocapital.com" target="_blank">Khavho Capital</a></li>
+                        <li><a href="https://khavhoholdings.com" target="_blank">Khavho Holdings</a></li>
+                        <li><a href="https://kiainvestments.com" target="_blank">Kia Investments</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact Info</h4>
+                    <p>Email: info@kg.co.za</p>
+                    <p>Serving Limpopo & Gauteng</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Khavho Group (KG). All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('message').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            // In production, send to Firebase or email service
+            console.log('Contact form submitted:', formData);
+            
+            alert('Thank you for contacting us! We will get back to you soon.');
+            this.reset();
+        });
+    </script>
+</body>
+</html>

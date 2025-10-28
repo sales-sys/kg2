@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - KG</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>KG</h1>
+                </div>
+                <nav class="nav" id="mainNav">
+                    <a href="index.html">Home</a>
+                    <a href="about.html">About</a>
+                    <a href="services.html">Services</a>
+                    <a href="products.html">Products</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="cart.html" class="cart-link">
+                        Cart <span class="cart-badge" id="cartCount">0</span>
+                    </a>
+                </nav>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Checkout Section -->
+    <section class="page-content">
+        <div class="container">
+            <h1 style="margin-bottom: 2rem;">Checkout</h1>
+            
+            <div class="checkout-container">
+                <!-- Shipping Information -->
+                <div class="checkout-form-section">
+                    <h2>Shipping Information</h2>
+                    <form id="checkoutForm">
+                        <div class="form-group">
+                            <label for="fullName">Full Name *</label>
+                            <input type="text" id="fullName" name="fullName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address">Street Address *</label>
+                            <input type="text" id="address" name="address" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city">City *</label>
+                                <input type="text" id="city" name="city" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="province">Province *</label>
+                                <select id="province" name="province" required>
+                                    <option value="">Select Province</option>
+                                    <option value="Limpopo">Limpopo</option>
+                                    <option value="Gauteng">Gauteng</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="postalCode">Postal Code *</label>
+                            <input type="text" id="postalCode" name="postalCode" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notes">Delivery Notes (Optional)</label>
+                            <textarea id="notes" name="notes" rows="3"></textarea>
+                        </div>
+
+                        <h2 style="margin-top: 2rem; margin-bottom: 1rem;">Payment Method</h2>
+                        <div class="payment-methods">
+                            <label class="payment-option">
+                                <input type="radio" name="paymentMethod" value="payfast" checked>
+                                <span>PayFast (Credit Card, Debit Card, EFT)</span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="paymentMethod" value="netcash">
+                                <span>Netcash (Instant EFT)</span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="paymentMethod" value="invoice">
+                                <span>Invoice (Business Customers)</span>
+                            </label>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="checkout-summary">
+                    <h2>Order Summary</h2>
+                    <div id="orderSummary"></div>
+                    <button class="btn btn-primary" style="background-color: #f97316; color: #fff; width: 100%;" onclick="processCheckout()">
+                        Place Order
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PayFast Form (Hidden) -->
+    <form id="payfastForm" method="POST" action="https://sandbox.payfast.co.za/eng/process" style="display: none;">
+        <input type="hidden" name="merchant_id" id="merchant_id">
+        <input type="hidden" name="merchant_key" id="merchant_key">
+        <input type="hidden" name="return_url" id="return_url">
+        <input type="hidden" name="cancel_url" id="cancel_url">
+        <input type="hidden" name="notify_url" id="notify_url">
+        <input type="hidden" name="name_first" id="name_first">
+        <input type="hidden" name="email_address" id="email_address">
+        <input type="hidden" name="cell_number" id="cell_number">
+        <input type="hidden" name="amount" id="amount">
+        <input type="hidden" name="item_name" id="item_name">
+        <input type="hidden" name="item_description" id="item_description">
+        <input type="hidden" name="custom_str1" id="custom_str1">
+    </form>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>KG</h3>
+                    <p>Your trusted procurement partner</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Our Group</h4>
+                    <ul>
+                        <li><a href="https://khavhocapital.com" target="_blank">Khavho Capital</a></li>
+                        <li><a href="https://khavhoholdings.com" target="_blank">Khavho Holdings</a></li>
+                        <li><a href="https://kiainvestments.com" target="_blank">Kia Investments</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact Info</h4>
+                    <p>Email: info@kg.co.za</p>
+                    <p>Serving Limpopo & Gauteng</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Khavho Group (KG). All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9FwYhcC5loYVUB0xRrkHfNw8WLj2Ttbs",
+            authDomain: "khavhogroups2.firebaseapp.com",
+            projectId: "khavhogroups2",
+            storageBucket: "khavhogroups2.firebasestorage.app",
+            messagingSenderId: "610556272278",
+            appId: "1:610556272278:web:0dcbb969e6a64a7c6a3af4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Load cart and display summary
+        const cart = window.KG.getCart();
+        if (cart.length === 0) {
+            window.location.href = 'cart.html';
+        }
+
+        const total = window.KG.getCartTotal();
+
+        // Pre-fill user info if logged in
+        const userStr = localStorage.getItem('kg-user');
+        if (userStr) {
+            const user = JSON.parse(userStr);
+            document.getElementById('email').value = user.email;
+        }
+
+        // Display order summary
+        document.getElementById('orderSummary').innerHTML = `
+            <div class="summary-items">
+                ${cart.map(item => `
+                    <div class="summary-item">
+                        <span>${item.name} x ${item.quantity}</span>
+                        <span>R ${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="summary-row">
+                <span>Subtotal:</span>
+                <span>R ${total.toFixed(2)}</span>
+            </div>
+            <div class="summary-row">
+                <span>Delivery:</span>
+                <span>R 0.00</span>
+            </div>
+            <div class="summary-row total">
+                <span>Total:</span>
+                <span>R ${total.toFixed(2)}</span>
+            </div>
+        `;
+
+        // Process checkout
+        window.processCheckout = async function() {
+            const form = document.getElementById('checkoutForm');
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const formData = {
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                city: document.getElementById('city').value,
+                province: document.getElementById('province').value,
+                postalCode: document.getElementById('postalCode').value,
+                notes: document.getElementById('notes').value,
+                paymentMethod: document.querySelector('input[name="paymentMethod"]:checked').value
+            };
+
+            try {
+                // Create order in Firestore
+                const orderData = {
+                    ...formData,
+                    items: cart,
+                    total: total,
+                    status: 'pending',
+                    createdAt: new Date().toISOString(),
+                    userId: userStr ? JSON.parse(userStr).uid : null
+                };
+
+                const docRef = await addDoc(collection(db, 'orders'), orderData);
+                const orderId = docRef.id;
+
+                // Process payment
+                if (formData.paymentMethod === 'payfast') {
+                    // PayFast integration
+                    const payfastForm = document.getElementById('payfastForm');
+                    document.getElementById('merchant_id').value = '10000100'; // Sandbox merchant ID
+                    document.getElementById('merchant_key').value = '46f0cd694581a';
+                    document.getElementById('return_url').value = window.location.origin + '/success.html?orderId=' + orderId;
+                    document.getElementById('cancel_url').value = window.location.origin + '/cart.html';
+                    document.getElementById('notify_url').value = window.location.origin + '/api/webhooks/payfast';
+                    document.getElementById('name_first').value = formData.fullName.split(' ')[0];
+                    document.getElementById('email_address').value = formData.email;
+                    document.getElementById('cell_number').value = formData.phone;
+                    document.getElementById('amount').value = total.toFixed(2);
+                    document.getElementById('item_name').value = 'KG Order #' + orderId.substring(0, 8);
+                    document.getElementById('item_description').value = cart.length + ' items';
+                    document.getElementById('custom_str1').value = orderId;
+                    
+                    payfastForm.submit();
+                } else if (formData.paymentMethod === 'netcash') {
+                    // Netcash integration
+                    alert('Netcash payment will be processed. Redirecting...');
+                    window.location.href = 'success.html?orderId=' + orderId;
+                } else {
+                    // Invoice
+                    window.location.href = 'success.html?orderId=' + orderId;
+                }
+
+                // Clear cart
+                window.KG.clearCart();
+
+            } catch (error) {
+                console.error('Checkout error:', error);
+                alert('Error processing order. Please try again.');
+            }
+        };
+    </script>
+    <script src="js/main.js"></script>
+</body>
+</html>

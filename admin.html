@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - KG</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>KG Admin</h1>
+                </div>
+                <nav class="nav" id="mainNav">
+                    <a href="index.html">Home</a>
+                    <a href="products.html">Products</a>
+                    <a href="admin.html" class="active">Admin</a>
+                </nav>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Admin Dashboard -->
+    <section class="page-content">
+        <div class="container">
+            <div class="admin-header">
+                <h1>Admin Dashboard</h1>
+                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <h3 id="totalOrders">0</h3>
+                    <p>Total Orders</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="pendingOrders">0</h3>
+                    <p>Pending Orders</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalRevenue">R 0.00</h3>
+                    <p>Total Revenue</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalProducts">0</h3>
+                    <p>Total Products</p>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="admin-filters">
+                <select id="statusFilter" class="filter-select">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="paid">Paid</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+                <input type="text" id="searchInput" placeholder="Search by order ID, customer name, email..." class="search-input">
+            </div>
+
+            <!-- Orders Table -->
+            <div class="admin-table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTable">
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 2rem;">Loading orders...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Order Details Modal -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2025 Khavho Group (KG). All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9FwYhcC5loYVUB0xRrkHfNw8WLj2Ttbs",
+            authDomain: "khavhogroups2.firebaseapp.com",
+            projectId: "khavhogroups2",
+            storageBucket: "khavhogroups2.firebasestorage.app",
+            messagingSenderId: "610556272278",
+            appId: "1:610556272278:web:0dcbb969e6a64a7c6a3af4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let allOrders = [];
+        let allProducts = [];
+        let currentUser = null;
+
+        // Check auth and admin role
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentUser = user;
+
+            // Check if user is admin
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (!userDoc.exists() || userDoc.data().role !== 'admin') {
+                alert('Access denied. Admin privileges required.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Load data
+            loadOrders();
+            loadProducts();
+        });
+
+        // Load all orders
+        async function loadOrders() {
+            try {
+                const ordersQuery = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+                const ordersSnapshot = await getDocs(ordersQuery);
+                
+                allOrders = ordersSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                updateStats();
+                displayOrders(allOrders);
+            } catch (error) {
+                console.error('Error loading orders:', error);
+            }
+        }
+
+        // Load all products
+        async function loadProducts() {
+            try {
+                const productsSnapshot = await getDocs(collection(db, 'products'));
+                allProducts = productsSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                document.getElementById('totalProducts').textContent = allProducts.length;
+            } catch (error) {
+                console.error('Error loading products:', error);
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            document.getElementById('totalOrders').textContent = allOrders.length;
+            
+            const pending = allOrders.filter(o => o.status === 'pending').length;
+            document.getElementById('pendingOrders').textContent = pending;
+            
+            const revenue = allOrders.reduce((sum, order) => sum + order.total, 0);
+            document.getElementById('totalRevenue').textContent = 'R ' + revenue.toFixed(2);
+        }
+
+        // Display orders in table
+        function displayOrders(orders) {
+            const tableBody = document.getElementById('ordersTable');
+            
+            if (orders.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem;">No orders found</td></tr>';
+                return;
+            }
+
+            tableBody.innerHTML = orders.map(order => `
+                <tr>
+                    <td>${order.id.substring(0, 8)}</td>
+                    <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <div>${order.fullName}</div>
+                        <small style="color: #6b7280;">${order.email}</small>
+                    </td>
+                    <td>${order.items.length} items</td>
+                    <td>R ${order.total.toFixed(2)}</td>
+                    <td>${order.paymentMethod}</td>
+                    <td>
+                        <select class="status-select status-${order.status}" data-order-id="${order.id}">
+                            <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="paid" ${order.status === 'paid' ? 'selected' : ''}>Paid</option>
+                            <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
+                            <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                            <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn-small btn-view" data-order-id="${order.id}">View</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Add event listeners
+            document.querySelectorAll('.status-select').forEach(select => {
+                select.addEventListener('change', handleStatusChange);
+            });
+
+            document.querySelectorAll('.btn-view').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const orderId = e.target.dataset.orderId;
+                    const order = allOrders.find(o => o.id === orderId);
+                    showOrderDetails(order);
+                });
+            });
+        }
+
+        // Handle status change
+        async function handleStatusChange(e) {
+            const orderId = e.target.dataset.orderId;
+            const newStatus = e.target.value;
+
+            try {
+                await updateDoc(doc(db, 'orders', orderId), {
+                    status: newStatus,
+                    updatedAt: new Date().toISOString()
+                });
+
+                // Update local data
+                const order = allOrders.find(o => o.id === orderId);
+                if (order) {
+                    order.status = newStatus;
+                }
+
+                updateStats();
+                alert('Order status updated successfully');
+            } catch (error) {
+                console.error('Error updating status:', error);
+                alert('Failed to update status');
+            }
+        }
+
+        // Show order details modal
+        function showOrderDetails(order) {
+            const modal = document.getElementById('orderModal');
+            const modalBody = document.getElementById('modalBody');
+
+            modalBody.innerHTML = `
+                <h2>Order Details</h2>
+                <div class="order-details-grid">
+                    <div>
+                        <h3>Order Information</h3>
+                        <p><strong>Order ID:</strong> ${order.id}</p>
+                        <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleString()}</p>
+                        <p><strong>Status:</strong> <span class="order-status status-${order.status}">${order.status}</span></p>
+                        <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
+                        <p><strong>Total:</strong> R ${order.total.toFixed(2)}</p>
+                    </div>
+                    <div>
+                        <h3>Customer Information</h3>
+                        <p><strong>Name:</strong> ${order.fullName}</p>
+                        <p><strong>Email:</strong> ${order.email}</p>
+                        <p><strong>Phone:</strong> ${order.phone}</p>
+                    </div>
+                    <div>
+                        <h3>Shipping Address</h3>
+                        <p>${order.address}</p>
+                        <p>${order.city}, ${order.province} ${order.postalCode}</p>
+                        ${order.notes ? `<p><strong>Notes:</strong> ${order.notes}</p>` : ''}
+                    </div>
+                </div>
+                <div>
+                    <h3>Order Items</h3>
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${order.items.map(item => `
+                                <tr>
+                                    <td>
+                                        <div>${item.name}</div>
+                                        <small style="color: #6b7280;">${item.code}</small>
+                                    </td>
+                                    <td>R ${item.price.toFixed(2)}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>R ${(item.price * item.quantity).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            modal.style.display = 'block';
+        }
+
+        // Filter orders
+        document.getElementById('statusFilter').addEventListener('change', filterOrders);
+        document.getElementById('searchInput').addEventListener('input', filterOrders);
+
+        function filterOrders() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+
+            let filtered = allOrders;
+
+            if (statusFilter) {
+                filtered = filtered.filter(o => o.status === statusFilter);
+            }
+
+            if (searchText) {
+                filtered = filtered.filter(o => 
+                    o.id.toLowerCase().includes(searchText) ||
+                    o.fullName.toLowerCase().includes(searchText) ||
+                    o.email.toLowerCase().includes(searchText)
+                );
+            }
+
+            displayOrders(filtered);
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                localStorage.removeItem('kg-user');
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Error signing out:', error);
+            }
+        });
+
+        // Modal close
+        const modal = document.getElementById('orderModal');
+        const closeBtn = document.querySelector('.modal-close');
+
+        closeBtn.onclick = () => {
+            modal.style.display = 'none';
+        };
+
+        window.onclick = (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+    </script>
+    <script src="js/main.js"></script>
+</body>
+</html>

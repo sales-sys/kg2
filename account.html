@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - KG</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>KG</h1>
+                </div>
+                <nav class="nav" id="mainNav">
+                    <a href="index.html">Home</a>
+                    <a href="about.html">About</a>
+                    <a href="services.html">Services</a>
+                    <a href="products.html">Products</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="cart.html" class="cart-link">
+                        Cart <span class="cart-badge" id="cartCount">0</span>
+                    </a>
+                    <a href="account.html" class="active" id="accountLink" style="display: none;">Account</a>
+                    <a href="#" id="logoutBtn" style="display: none;">Logout</a>
+                </nav>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Account Section -->
+    <section class="page-content">
+        <div class="container">
+            <div id="accountContent">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>KG</h3>
+                    <p>Your trusted procurement partner</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Our Group</h4>
+                    <ul>
+                        <li><a href="https://khavhocapital.com" target="_blank">Khavho Capital</a></li>
+                        <li><a href="https://khavhoholdings.com" target="_blank">Khavho Holdings</a></li>
+                        <li><a href="https://kiainvestments.com" target="_blank">Kia Investments</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact Info</h4>
+                    <p>Email: info@kg.co.za</p>
+                    <p>Serving Limpopo & Gauteng</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Khavho Group (KG). All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9FwYhcC5loYVUB0xRrkHfNw8WLj2Ttbs",
+            authDomain: "khavhogroups2.firebaseapp.com",
+            projectId: "khavhogroups2",
+            storageBucket: "khavhogroups2.firebasestorage.app",
+            messagingSenderId: "610556272278",
+            appId: "1:610556272278:web:0dcbb969e6a64a7c6a3af4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Check if user is logged in
+        const userStr = localStorage.getItem('kg-user');
+        if (!userStr) {
+            window.location.href = 'login.html';
+        }
+
+        const user = JSON.parse(userStr);
+
+        // Show account link and logout button
+        document.getElementById('accountLink').style.display = 'inline-block';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+            e.preventDefault();
+            await signOut(auth);
+            localStorage.removeItem('kg-user');
+            window.location.href = 'login.html';
+        });
+
+        // Load user profile and orders
+        async function loadAccount() {
+            try {
+                // Get user profile
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                const userData = userDoc.data();
+
+                // Get user orders
+                const ordersRef = collection(db, 'orders');
+                const q = query(ordersRef, where('userId', '==', user.uid), orderBy('createdAt', 'desc'));
+                const ordersSnapshot = await getDocs(q);
+                
+                const orders = [];
+                ordersSnapshot.forEach(doc => {
+                    orders.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Render account page
+                document.getElementById('accountContent').innerHTML = `
+                    <div class="account-container">
+                        <div class="account-sidebar">
+                            <h2>My Account</h2>
+                            <div class="account-nav">
+                                <a href="#profile" class="account-nav-link active" onclick="showSection('profile')">Profile</a>
+                                <a href="#orders" class="account-nav-link" onclick="showSection('orders')">My Orders</a>
+                                <a href="#" onclick="logout()">Logout</a>
+                            </div>
+                        </div>
+
+                        <div class="account-main">
+                            <div id="profileSection" class="account-section">
+                                <h2>Profile Information</h2>
+                                <div class="profile-info">
+                                    <div class="info-row">
+                                        <label>Full Name:</label>
+                                        <span>${userData?.fullName || 'N/A'}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <label>Email:</label>
+                                        <span>${userData?.email || user.email}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <label>Phone:</label>
+                                        <span>${userData?.phone || 'N/A'}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <label>Member Since:</label>
+                                        <span>${new Date(userData?.createdAt).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="ordersSection" class="account-section" style="display: none;">
+                                <h2>My Orders</h2>
+                                ${orders.length === 0 ? '<p>No orders yet</p>' : `
+                                    <div class="orders-list">
+                                        ${orders.map(order => `
+                                            <div class="order-card">
+                                                <div class="order-header">
+                                                    <h3>Order #${order.id.substring(0, 8)}</h3>
+                                                    <span class="order-status status-${order.status}">${order.status}</span>
+                                                </div>
+                                                <div class="order-details">
+                                                    <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
+                                                    <p><strong>Total:</strong> R ${order.total.toFixed(2)}</p>
+                                                    <p><strong>Items:</strong> ${order.items.length}</p>
+                                                </div>
+                                                <div class="order-items">
+                                                    ${order.items.map(item => `
+                                                        <div class="order-item">
+                                                            <span>${item.name} x ${item.quantity}</span>
+                                                            <span>R ${(item.price * item.quantity).toFixed(2)}</span>
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Make functions global
+                window.showSection = function(section) {
+                    document.getElementById('profileSection').style.display = section === 'profile' ? 'block' : 'none';
+                    document.getElementById('ordersSection').style.display = section === 'orders' ? 'block' : 'none';
+                    
+                    document.querySelectorAll('.account-nav-link').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    event.target.classList.add('active');
+                };
+
+                window.logout = async function() {
+                    await signOut(auth);
+                    localStorage.removeItem('kg-user');
+                    window.location.href = 'login.html';
+                };
+
+            } catch (error) {
+                console.error('Error loading account:', error);
+                document.getElementById('accountContent').innerHTML = '<p class="error">Error loading account. Please try again.</p>';
+            }
+        }
+
+        loadAccount();
+    </script>
+    <script src="js/main.js"></script>
+</body>
+</html>

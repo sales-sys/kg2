@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - KG</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>KG</h1>
+                </div>
+                <nav class="nav" id="mainNav">
+                    <a href="index.html">Home</a>
+                    <a href="about.html">About</a>
+                    <a href="services.html">Services</a>
+                    <a href="products.html">Products</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="cart.html" class="cart-link active">
+                        Cart <span class="cart-badge" id="cartCount">0</span>
+                    </a>
+                </nav>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" style="padding: 3rem 0;">
+        <div class="container">
+            <div class="hero-content" style="text-align: center; max-width: 100%;">
+                <h1>Shopping Cart</h1>
+                <p>Review your items and proceed to checkout</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Section -->
+    <section class="page-content">
+        <div class="container">
+            <div id="cartContent">
+                <!-- Cart items will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>KG</h3>
+                    <p>Your trusted procurement partner</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Our Group</h4>
+                    <ul>
+                        <li><a href="https://khavhocapital.com" target="_blank">Khavho Capital</a></li>
+                        <li><a href="https://khavhoholdings.com" target="_blank">Khavho Holdings</a></li>
+                        <li><a href="https://kiainvestments.com" target="_blank">Kia Investments</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact Info</h4>
+                    <p>Email: info@kg.co.za</p>
+                    <p>Serving Limpopo & Gauteng</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Khavho Group (KG). All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        function renderCart() {
+            const cart = window.KG.getCart();
+            const cartContent = document.getElementById('cartContent');
+            
+            if (cart.length === 0) {
+                cartContent.innerHTML = `
+                    <div class="empty-cart">
+                        <h2>Your cart is empty</h2>
+                        <p>Browse our products and add items to your cart</p>
+                        <a href="products.html" class="btn btn-primary" style="background-color: #f97316; color: #fff; margin-top: 1rem;">
+                            Browse Products
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+            
+            const total = window.KG.getCartTotal();
+            
+            cartContent.innerHTML = `
+                <div class="cart-container">
+                    <div class="cart-items">
+                        <h2>Cart Items</h2>
+                        ${cart.map(item => `
+                            <div class="cart-item">
+                                <div class="cart-item-info">
+                                    <h3>${item.name}</h3>
+                                    <p class="cart-item-price">R ${item.price.toFixed(2)}</p>
+                                </div>
+                                <div class="cart-item-actions">
+                                    <input 
+                                        type="number" 
+                                        value="${item.quantity}" 
+                                        min="1" 
+                                        class="quantity-input"
+                                        onchange="updateQuantity('${item.id}', this.value)"
+                                    >
+                                    <button class="btn-remove" onclick="removeItem('${item.id}')">Remove</button>
+                                </div>
+                                <div class="cart-item-total">
+                                    R ${(item.price * item.quantity).toFixed(2)}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="cart-summary">
+                        <h2>Order Summary</h2>
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span>R ${total.toFixed(2)}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Delivery:</span>
+                            <span>Calculated at checkout</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total:</span>
+                            <span>R ${total.toFixed(2)}</span>
+                        </div>
+                        <button class="btn btn-primary" style="background-color: #f97316; color: #fff; width: 100%; margin-top: 1rem;" onclick="proceedToCheckout()">
+                            Proceed to Checkout
+                        </button>
+                        <a href="products.html" style="display: block; text-align: center; margin-top: 1rem; color: #f97316;">
+                            Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+        
+        window.updateQuantity = function(id, quantity) {
+            window.KG.updateCartQuantity(id, quantity);
+            renderCart();
+        };
+        
+        window.removeItem = function(id) {
+            if (confirm('Remove this item from cart?')) {
+                window.KG.removeFromCart(id);
+                renderCart();
+            }
+        };
+        
+        window.proceedToCheckout = function() {
+            window.location.href = 'checkout.html';
+        };
+        
+        // Render cart on page load
+        document.addEventListener('DOMContentLoaded', renderCart);
+    </script>
+    <script src="js/auth.js"></script>
+</body>
+</html>
